@@ -126,7 +126,7 @@ app.post("/submit-test", async (req, res) => {
     
     // Send results back to Streamlit to save in test_results.json
     try {
-      await axios.post("http://localhost:5002/save_test_result", {
+      await axios.post("https://streamlit-app-4xyh.onrender.com/save_test_result", {
         email,
         skill,
         score,
