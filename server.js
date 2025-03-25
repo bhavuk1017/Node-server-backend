@@ -15,6 +15,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
+const db = mongoose.connection.useDb("certification_platform");
+const test_results_collection = db.collection("test_results");
 // Violation schema and model
 const violationSchema = new mongoose.Schema({
   type: String,
@@ -22,6 +24,7 @@ const violationSchema = new mongoose.Schema({
 });
 
 const Violation = mongoose.model("Violation", violationSchema);
+
 
 // Log violations (POST)
 app.post("/log-violation", async (req, res) => {
