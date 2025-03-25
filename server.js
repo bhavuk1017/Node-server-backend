@@ -124,18 +124,18 @@ app.post("/submit-test", async (req, res) => {
     const scoreMatch = evaluation.match(/Score:\s*(\d+)\/10/);
     const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
     
-    // Send results back to Streamlit to save in test_results.json
-    try {
-      await axios.post("https://streamlit-app-4xyh.onrender.com/save_test_result", {
-        email,
-        skill,
-        score,
-        feedback: evaluation
-      });
-    } catch (streamlitError) {
-      console.error("Error sending results to Streamlit:", streamlitError);
-      // Continue anyway to show results to user
-    }
+    // Save test result directly to MongoDB
+    const testResult = {
+      email,
+      skill,
+      score,
+      date: new Date(),
+      questions,
+      answers,
+      feedback: evaluation
+    };
+
+    await test_results_collection.insertOne(testResult);
     
     // Return the score and evaluation to React
     return res.json({ 
