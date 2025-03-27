@@ -3,6 +3,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const axios = require("axios");
 require("dotenv").config();
+const http = require('http');
+const socketIo = require('socket.io');
 
 const app = express();
 
@@ -24,6 +26,34 @@ const violationSchema = new mongoose.Schema({
 });
 
 const Violation = mongoose.model("Violation", violationSchema);
+
+// Create HTTP server
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+  
+  socket.on('test_started', (data) => {
+    console.log(`Test started for ${data.email} on ${data.skill}`);
+    // You could store this in a database or in-memory
+  });
+  
+  socket.on('test_progress', (data) => {
+    // Track progress in real-time
+    console.log(`Test progress for ${data.email}: ${data.questionsAnswered}/10`);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+});
 
 
 // Log violations (POST)
@@ -152,8 +182,11 @@ app.post("/submit-test", async (req, res) => {
   }
 });
 
+
+
 // Start the server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
